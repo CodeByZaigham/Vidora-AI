@@ -1,0 +1,28 @@
+#-----backend------
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+python-dotenv
+requests
+
+# --- Audio / video acquisition ---
+yt-dlp
+pydub
+audioop-lts
+openai-whisper
+
+# --- LLM orchestration ---
+langchain
+langchain-core
+langchain-community
+langchain-classic
+langchain-mistralai
+langchain-text-splitters
+langchain-huggingface
+
+# --- Embeddings + vector store ---
+sentence-transformers
+chromadb
+langchain-chroma
