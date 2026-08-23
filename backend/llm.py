@@ -1,6 +1,10 @@
 from langchain_mistralai import ChatMistralAI
-from dotenv import load_dotenv
-load_dotenv()
 
-def get_llm():
-     return ChatMistralAI(model="mistral-medium-latest")
+from config import settings
+
+
+def get_llm() -> ChatMistralAI:
+    return ChatMistralAI(
+        model=settings.llm_model,
+        api_key=settings.mistral_api_key,
+    )
