@@ -1,37 +1,41 @@
-from langchain_core.runnables import RunnableSequence
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableSequence
+
 from llm import get_llm
 
-llm=get_llm()
+llm = get_llm()
 
-def build_chain(system_prompt , summary:str) -> RunnableSequence:
-     return RunnableSequence(
-          ChatPromptTemplate.from_messages([
-               ("system",system_prompt),
-               ("human",summary)
-          ])
-          | llm | StrOutputParser()
-     )
 
-def get_title(summary:str) -> str:
-     prompt=(
-          "I am giving you multiple summarized chunks of a meeting transcript. "
-          "Analyze all the chunks together and generate one concise, meaningful title "
-          "that accurately represents the main topic and purpose of the meeting. "
-          "Return only the title, without quotes, explanations, or additional text."
-     )
+def build_chain(system_prompt: str) -> RunnableSequence:
+    return RunnableSequence(
+        ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "{summary}"),
+        ])
+        | llm | StrOutputParser()
+    )
 
-     chain=build_chain(prompt,summary)
 
-     return chain.invoke({})
+def get_title(summary: str) -> str:
+    prompt = (
+        "I am giving you multiple summarized chunks of a meeting transcript. "
+        "Analyze all the chunks together and generate one concise, meaningful title "
+        "that accurately represents the main topic and purpose of the meeting. "
+        "Return only the title, without quotes, explanations, or additional text."
+    )
+    return build_chain(prompt).invoke({"summary": summary})
 
-def get_summary(summary:str) -> str:
-     prompt="I am giving you multiple summarized chunks of my meeting's transcript" \
-     "combine it and generate one proper summary of the meeting."
-     return build_chain(prompt,summary).invoke({})
 
-def get_questions(summary:str) -> str:
+def get_summary(summary: str) -> str:
+    prompt = (
+        "I am giving you multiple summarized chunks of my meeting's transcript. "
+        "Combine it and generate one proper summary of the meeting."
+    )
+    return build_chain(prompt).invoke({"summary": summary})
+
+
+def get_questions(summary: str) -> str:
     prompt = (
         "I am giving you multiple summarized chunks of a meeting transcript. "
         "Extract all important questions that were explicitly asked during the meeting. "
@@ -39,9 +43,10 @@ def get_questions(summary:str) -> str:
         "Return only the questions as a clear numbered list. "
         "Do not generate new questions and do not provide a summary."
     )
-    return build_chain(prompt, summary).invoke({})
+    return build_chain(prompt).invoke({"summary": summary})
 
-def get_decisions(summary:str) -> str:
+
+def get_decisions(summary: str) -> str:
     prompt = (
         "I am giving you multiple summarized chunks of a meeting transcript. "
         "Analyze all the chunks together and identify the key decisions that were "
@@ -50,9 +55,10 @@ def get_decisions(summary:str) -> str:
         "Do not include suggestions or unresolved discussions. "
         "Return only the decisions as a clear numbered list."
     )
-    return build_chain(prompt, summary).invoke({})
-     
-def get_actions(summary:str) -> str:
+    return build_chain(prompt).invoke({"summary": summary})
+
+
+def get_actions(summary: str) -> str:
     prompt = (
         "I am giving you multiple summarized chunks of a meeting transcript. "
         "Analyze all the chunks together and identify the action items agreed upon "
@@ -62,6 +68,4 @@ def get_actions(summary:str) -> str:
         "not require an action. "
         "Return only the action items as a clear numbered list."
     )
-    return build_chain(prompt, summary).invoke({})
-     
-     
+    return build_chain(prompt).invoke({"summary": summary})

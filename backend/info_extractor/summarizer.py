@@ -1,9 +1,11 @@
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from RAG_pipeline.textsplitter import split_text
-from llm import get_llm
+from langchain_core.prompts import ChatPromptTemplate
 
-llm=get_llm()
+from llm import get_llm
+from RAG_pipeline.textsplitter import split_text
+
+llm = get_llm()
+
 
 def summarize_chunks(transcript: str) -> str:
     prompt = ChatPromptTemplate.from_messages([
@@ -23,18 +25,12 @@ def summarize_chunks(transcript: str) -> str:
             Do not invent information or add details that are not present.
             Keep the summary short and factual."""
         ),
-        ("human", "{text}")
+        ("human", "{text}"),
     ])
 
     summary_chain = prompt | llm | StrOutputParser()
 
     chunks = split_text(transcript)
-
-    summaries = [
-        summary_chain.invoke({"text": chunk})
-        for chunk in chunks
-    ]
+    summaries = [summary_chain.invoke({"text": chunk}) for chunk in chunks]
 
     return "\n".join(summaries)
-
-
