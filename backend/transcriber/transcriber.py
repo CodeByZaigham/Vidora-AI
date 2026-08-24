@@ -1,29 +1,34 @@
-import whisper
 import os
-# from audioprocessor.audioprocessing import process_audio
+import threading
 
-MODEL_NAME=os.getenv("TRANSCRIPTION_MODEL",default="tiny")
+import whisper
 
-_model=None
+MODEL_NAME = os.getenv("TRANSCRIPTION_MODEL", "tiny")
+
+_model = None
+_model_lock = threading.Lock()
+
 
 def load_model():
-     global _model
+    global _model
+    if _model is None:
+        with _model_lock:
+            if _model is None:  # re-check inside the lock
+                _model = whisper.load_model(MODEL_NAME)
+    return _model
 
-     if _model==None:
-          _model=whisper.load_model(MODEL_NAME)
 
-     return _model
+def transcribe_chunk(path: str, translate: bool = False) -> str:
+    model = load_model()
+    task = "translate" if translate else "transcribe"
+    result = model.transcribe(path, task=task)
+    return result["text"].strip()
 
-def transcribe_chunk(path:str , translate:bool=False):
-     model=load_model()
-     task="translate" if translate else "transcribe"
-     text=model.transcribe(path,task="translate")
-     return text["text"]
 
-def transcribe(chunks:list , translate:bool=False):
-     transcript=""
-     for i , chunk in enumerate(chunks):
-          text=transcribe_chunk(chunk,translate)
-          transcript+=text + " "
-     return text
-
+def transcribe(chunks: list[str], translate: bool = False) -> str:
+    """Transcribe each chunk in order and join them into one full transcript."""
+    parts = []
+    for i, chunk_path in enumerate(chunks):
+        text = transcribe_chunk(chunk_path, translate)
+        parts.append(text)
+    return " ".join(parts).strip()
