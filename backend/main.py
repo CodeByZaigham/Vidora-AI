@@ -1,36 +1,34 @@
-from audioprocessor.audioprocessing import process_audio
-from transcriber.transcriber import transcribe
-from info_extractor.summarizer import summarize_chunks
-from info_extractor import extractor as e
-from RAG_pipeline.embeddings import create_embeddings,load_embeddings
-from RAG_pipeline.retriever import retrieve_embeddings
-from RAG_pipeline.ask_llm import ask
+import logging
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from config import settings
+from routes import chat, insights, system, transcript, videos
 
-url="https://www.youtube.com/watch?v=qYNweeDHiyU&pp=ygUDaWJt"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
-chunks=process_audio(url)
-transcript=transcribe(chunks)
-summary=summarize_chunks(transcript)
+app = FastAPI(
+    title="AI Video Assistant",
+    description=(
+        "Turn any YouTube URL or locally uploaded video/audio file into a "
+        "transcript, an AI-generated title/summary/questions/decisions/action "
+        "items, and a question-answering assistant grounded in that video."
+    ),
+    version="2.0.0",
+)
 
-print("\n===== TITLE =====\n") 
-print(e.get_title(summary)) 
-print("\n=================\n") 
-print("\n===== SUMMARY =====\n") 
-print(e.get_summary(summary))
-print("\n===================\n") 
-print("\n===== QUESTIONS =====\n") 
-print(e.get_questions(summary)) 
-print("\n=====================\n") 
-print("\n===== DECISIONS =====\n") 
-print(e.get_decisions(summary)) 
-print("\n=====================\n")
-print("\n===== ACTION ITEMS =====\n") 
-print(e.get_actions(summary))
-print("\n=======================\n")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# chunks=split_text(transcript)
-db=load_embeddings()
-query = input("ASK ANY QUESTION ABOUT THE VIDEO: ")
-retrieved_chunks=retrieve_embeddings(query,db)
-output=ask(query,retrieved_chunks)
-print(output)
+app.include_router(system.router)
+app.include_router(videos.router)
+app.include_router(transcript.router)
+app.include_router(insights.router)
+app.include_router(chat.router)

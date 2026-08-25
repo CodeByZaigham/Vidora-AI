@@ -1,32 +1,3 @@
-"""
-Audio acquisition + chunking.
-
-Core logic is unchanged from the original prototype (yt-dlp for downloads,
-pydub for conversion/chunking): every function still takes an explicit
-output_dir so concurrent videos never collide.
-
-What's new here is resilience around the YouTube download step specifically,
-since that's the one network call in the whole pipeline and the one most
-likely to fail transiently:
-
-- Automatic retry with exponential backoff for retryable errors (403 / 429 /
-  timeouts / connection resets). Whisper, the LLM calls, and local file
-  conversion don't need this -- only the network call to YouTube does.
-- extractor_args requesting a couple of different "player clients". YouTube's
-  bot-detection reacts differently per client, and this is currently the
-  most effective built-in yt-dlp workaround for spurious 403s.
-- Optional cookies file support (YT_COOKIES_FILE) -- authenticated requests
-  get blocked far less often than anonymous ones.
-- A raised error only ever contains a short, clean message (no ANSI codes,
-  no multi-hundred-line dumps) telling the caller what actually happened and
-  what to try next.
-
-None of this can *guarantee* YouTube won't block a given request -- their
-bot-detection changes over time -- but it turns "fails once, permanently
-dead" into "retries automatically, and tells you clearly if it's still
-failing after that."
-"""
-
 import logging
 import os
 import time
