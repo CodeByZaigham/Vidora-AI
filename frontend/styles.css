@@ -1,3 +1,12 @@
+/* ============================================================
+   AI Video Assistant — light theme
+   Palette: warm paper + ink, one signature "tape/rec" accent.
+   Type: IBM Plex Mono for UI chrome/labels, Source Serif 4 for
+   reading content (titles, summaries, transcript).
+   Signature element: a VU-meter bar cluster, used both as the
+   processing loader and as a tiny per-video status glyph.
+   ============================================================ */
+
 :root {
   --paper: #f6f3ec;
   --surface: #ffffff;
@@ -368,9 +377,9 @@ input {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink);
-  white-space: nowrap;
+  white-space: wrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: hidden;
 }
 
 .video-card-meta {
@@ -774,6 +783,14 @@ input {
   justify-content: center;
   z-index: 200;
   padding: 20px;
+}
+
+/* Without this, the browser's default `[hidden] { display: none }` rule
+   loses to the `display: flex` above (author styles always win over the
+   user-agent stylesheet, regardless of selector specificity), so setting
+   `overlay.hidden = true` in JS would never actually hide the modal. */
+.modal-overlay[hidden] {
+  display: none;
 }
 
 .modal {
