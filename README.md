@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="screenshots/vidora_ai_poster.png" alt="Vidora AI - Video Intelligence System" width="100%">
+</p>
 <div align="center">
 
 # 🎬 Vidora AI
