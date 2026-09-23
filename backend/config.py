@@ -6,8 +6,8 @@ import os
 
 class Settings(BaseSettings):
     # --- LLM ---
-    mistral_api_key: str = os.getenv("MISTRAL_API_KEY")
-    llm_model: str = "mistral-medium-latest"
+    mistral_api_key: str = os.getenv("GROQ_API_KEY")
+    llm_model: str = "openai/gpt-oss-120b"
 
     # --- Transcription ---
     transcription_model: str = "tiny"          # whisper model size: tiny/base/small/medium/large
