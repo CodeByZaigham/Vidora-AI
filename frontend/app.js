@@ -1,6 +1,6 @@
 "use strict";
 
-const DEFAULT_API_BASE = "http://127.0.0.1:8000";
+const DEFAULT_API_BASE = "/api";
 const POLL_INTERVAL_MS = 2500;
 
 const state = {
