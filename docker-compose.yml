@@ -1,0 +1,27 @@
+services:
+
+  backend:
+    image: codebyzaigham/vidoraai-backend:1.0
+    build:
+      context: ./backend
+    container_name: vidora-backend
+
+    ports:
+      - "8000:8000"
+    
+    env_file:
+    - ./backend/.env
+    volumes:
+      - ./backend/data:/app/data
+
+  frontend:
+    image: codebyzaigham/vidoraai-frontend:1.0
+    build:
+      context: ./frontend
+    container_name: vidora-frontend
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      - backend
